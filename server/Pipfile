@@ -8,6 +8,7 @@ flask = "*"
 pillow = "*"
 numpy = "*"
 flask-cors = "*"
+scikit-image = "*"
 
 [dev-packages]
 
