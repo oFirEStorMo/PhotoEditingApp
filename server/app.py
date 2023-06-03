@@ -1,32 +1,35 @@
-import base64
 from flask import Flask, request, jsonify
 from PIL import Image
 import io
+import base64
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes in the app
 
-# Sample endpoint to receive an image and respond with the same image
 @app.route('/process_image', methods=['POST'])
 def process_image():
-    # Retrieve the image file from the request
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'})
+
     image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({'error': 'Invalid image file'})
 
-    # Load the image using PIL
-    image = Image.open(image_file)
+    try:
+        # Open and process the image
+        image = Image.open(image_file)
+        # Perform your image processing tasks here using the 'image' object
+        
+        # Convert the processed image to base64 string
+        buffered = io.BytesIO()
+        image.save(buffered, format='JPEG')
+        encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        return jsonify({'image': encoded_image})
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
-    # Process the image (e.g., perform some transformations or analysis)
-    # ...
-
-    # Create a response image (e.g., generate a modified version of the input image)
-    response_image = image  # Placeholder for demonstration purposes
-
-    # Convert the response image to bytes
-    response_image_bytes = io.BytesIO()
-    response_image.save(response_image_bytes, format='JPEG')
-    response_image_bytes.seek(0)
-
-    # Return the response image as the API response
-    return jsonify(image=base64.b64encode(response_image_bytes.read()).decode('utf-8'))
 
 if __name__ == '__main__':
     app.run()
