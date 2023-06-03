@@ -230,32 +230,38 @@ def contrast_adjustment(image, factor):
 
 
 def rotate_image(image, angle):
-    width, height = image.size
-    angle_rad = math.radians(angle)
-    cos_theta = math.cos(angle_rad)
-    sin_theta = math.sin(angle_rad)
-
-    # Create a grid of coordinates for the new image
-    new_coords_x, new_coords_y = np.meshgrid(range(width), range(height))
-    new_coords_x -= width // 2
-    new_coords_y -= height // 2
-
-    # Apply the rotation transformation to the coordinates
-    original_coords_x = np.round(new_coords_x * cos_theta + new_coords_y * sin_theta + width // 2).astype(int)
-    original_coords_y = np.round(-new_coords_x * sin_theta + new_coords_y * cos_theta + height // 2).astype(int)
-
-    # Mask to ensure only valid coordinates are used
-    valid_mask = (original_coords_x >= 0) & (original_coords_x < width) & (original_coords_y >= 0) & (original_coords_y < height)
-
-    # Get the pixel values from the original image using the transformed coordinates
-    original_pixels = np.array(image)
-    rotated_pixels = np.zeros_like(original_pixels)
-    rotated_pixels[new_coords_y[valid_mask], new_coords_x[valid_mask]] = original_pixels[original_coords_y[valid_mask], original_coords_x[valid_mask]]
-
-    # Create a new PIL image from the rotated pixel values
-    rotated_image = Image.fromarray(rotated_pixels, mode='RGB')
-
+    # Rotate the image
+    rotated_image = image.rotate(int(angle), expand=True)
+    
     return rotated_image
+
+# def rotate_image(image, angle):
+#     width, height = image.size
+#     angle_rad = math.radians(int(angle))
+#     cos_theta = math.cos(angle_rad)
+#     sin_theta = math.sin(angle_rad)
+
+#     # Create a grid of coordinates for the new image
+#     new_coords_x, new_coords_y = np.meshgrid(range(width), range(height))
+#     new_coords_x -= width // 2
+#     new_coords_y -= height // 2
+
+#     # Apply the rotation transformation to the coordinates
+#     original_coords_x = np.round(new_coords_x * cos_theta + new_coords_y * sin_theta + width // 2).astype(int)
+#     original_coords_y = np.round(-new_coords_x * sin_theta + new_coords_y * cos_theta + height // 2).astype(int)
+
+#     # Mask to ensure only valid coordinates are used
+#     valid_mask = (original_coords_x >= 0) & (original_coords_x < width) & (original_coords_y >= 0) & (original_coords_y < height)
+
+#     # Get the pixel values from the original image using the transformed coordinates
+#     original_pixels = np.array(image)
+#     rotated_pixels = np.zeros_like(original_pixels)
+#     rotated_pixels[new_coords_y[valid_mask], new_coords_x[valid_mask]] = original_pixels[original_coords_y[valid_mask], original_coords_x[valid_mask]]
+
+#     # Create a new PIL image from the rotated pixel values
+#     rotated_image = Image.fromarray(rotated_pixels, mode='RGB')
+
+#     return rotated_image
 
 
 def open_operation(image, size=3):
@@ -283,16 +289,13 @@ def close_operation(image, size=3):
 
     return closed_pil_image
 
-import math
-import numpy as np
-from PIL import Image
 
 def posterize(image, num_colors):
     # Convert image to RGB mode
     image_rgb = image.convert('RGB')
 
     # Calculate the step size between each quantized color level
-    step_size = 255 // num_colors
+    step_size = 255 // int(num_colors)
 
     # Create a numpy array from the image
     pixels = np.array(image_rgb)

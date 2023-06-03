@@ -4,12 +4,15 @@ import Form from 'react-bootstrap/Form';
 import { Row, Col, ListGroup, Button } from 'react-bootstrap';
 import axios from 'axios';
 import LoadingOverlay from 'react-loading-overlay-ts';
+import RangeSlider from 'react-bootstrap-range-slider';
 
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [responseImage, setResponseImage] = useState(null);
   const [isActive, setActive] = useState(false)
+  const [numColor, setNumColor] = React.useState(16);
+  const [angle, setAngle] = React.useState(360);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -88,20 +91,20 @@ function App() {
 
   const handleUnsharp = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/unsharp', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -111,23 +114,23 @@ function App() {
       }
     }
   };
-  
+
   const handleHistogramEqualized = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/histogram', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -137,23 +140,23 @@ function App() {
       }
     }
   };
-  
+
   const handleOld = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/old', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -163,23 +166,23 @@ function App() {
       }
     }
   };
-  
+
   const handleVignetting = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/vignetting_api', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -189,23 +192,23 @@ function App() {
       }
     }
   };
-  
+
   const handlePhotocopy = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/photocopy_api', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -215,23 +218,23 @@ function App() {
       }
     }
   };
-  
+
   const handleNightvision = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/nightvision_api', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -241,23 +244,23 @@ function App() {
       }
     }
   };
-  
+
   const handleMirror = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/mirror_api', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -267,23 +270,23 @@ function App() {
       }
     }
   };
-  
+
   const handleGrayscale = async (e) => {
     e.preventDefault();
-  
+
     if (selectedImage) {
       const formData = new FormData();
       formData.append('image', selectedImage);
-  
+
       try {
         setActive(true); // Set active to true at the beginning of the try block
-  
+
         const response = await axios.post('http://localhost:5000/grayscale_api', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
-  
+
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
@@ -293,7 +296,63 @@ function App() {
       }
     }
   };
-  
+
+  const handlePosterize = async (e) => {
+    e.preventDefault();
+    // console.log(numColor);
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+      formData.append('numColor', numColor);
+
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+
+        const response = await axios.post('http://localhost:5000/posterize_api', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+
+  const handleRotate = async (e) => {
+    e.preventDefault();
+    // console.log(numColor);
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+      formData.append('angle', angle);
+
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+
+        const response = await axios.post('http://localhost:5000/rotate', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+
 
   return (
     <LoadingOverlay
@@ -395,6 +454,52 @@ function App() {
                   </div>
                   <div className='my-3 text-center'>
                     <Button variant="outline-dark" onClick={handleMirror}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Posterize Image
+                  </div>
+                  <div className='my-3 text-center'>
+                  <Form>
+                      <Form.Group controlId="numColorInput">
+                        <Form.Label>Number of Color</Form.Label>
+                        <Form.Control
+                          type="number"
+                          value={numColor}
+                          onChange={e => setNumColor(e.target.value)}
+                          min={2}
+                          max={255}
+                          step={1}
+                        />
+                      </Form.Group>
+                      <div className='mt-3'>
+                        <Button variant="dark" type='submit' onClick={handlePosterize}>Rotate</Button>
+                      </div>
+                    </Form>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Rotate Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Form>
+                      <Form.Group controlId="angleInput">
+                        <Form.Label>Angle</Form.Label>
+                        <Form.Control
+                          type="number"
+                          value={angle}
+                          onChange={e => setAngle(e.target.value)}
+                          min={1}
+                          max={360}
+                          step={1}
+                        />
+                      </Form.Group>
+                      <div className='mt-3'>
+                        <Button variant="dark" type='submit' onClick={handleRotate}>Rotate</Button>
+                      </div>
+                    </Form>
                   </div>
                 </ListGroup.Item>
               </ListGroup>
