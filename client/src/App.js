@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import { Row, Col, ListGroup, Button } from 'react-bootstrap';
-import axios from 'axios';
-import LoadingOverlay from 'react-loading-overlay-ts';
-import RangeSlider from 'react-bootstrap-range-slider';
-
+import React, { useState, useRef } from "react";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import { Row, Col, ListGroup, Button } from "react-bootstrap";
+import axios from "axios";
+import LoadingOverlay from "react-loading-overlay-ts";
+import RangeSlider from "react-bootstrap-range-slider";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [responseImage, setResponseImage] = useState(null);
-  const [isActive, setActive] = useState(false)
+  const [isActive, setActive] = useState(false);
   const [numColor, setNumColor] = React.useState(16);
   const [angle, setAngle] = React.useState(360);
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -24,21 +28,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true);
-        const response = await axios.post('http://localhost:5000/blur', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+        const response = await axios.post(
+          "http://localhost:5000/blur",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         setActive(false);
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     }
   };
@@ -48,20 +56,24 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true);
-        const response = await axios.post('http://localhost:5000/sobel', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/sobel",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         setActive(false);
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     }
   };
@@ -71,20 +83,24 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true);
-        const response = await axios.post('http://localhost:5000/laplacian', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/laplacian",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         setActive(false);
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     }
   };
@@ -94,21 +110,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/unsharp', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/unsharp",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -120,21 +140,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/histogram', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/histogram",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -146,21 +170,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/old', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/old",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -172,21 +200,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/vignetting_api', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/vignetting_api",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -198,21 +230,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/photocopy_api', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/photocopy_api",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -224,21 +260,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/nightvision_api', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/nightvision_api",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -250,21 +290,25 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/mirror_api', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/mirror_api",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -276,21 +320,57 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
+      formData.append("image", selectedImage);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/grayscale_api', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/grayscale_api",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+
+  const handleOilPainting = async (e) => {
+    e.preventDefault();
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append("image", selectedImage);
+
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+
+        const response = await axios.post(
+          "http://localhost:5000/oil",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        console.log(response.data);
+
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -303,22 +383,26 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
-      formData.append('numColor', numColor);
+      formData.append("image", selectedImage);
+      formData.append("numColor", numColor);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/posterize_api', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/posterize_api",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
@@ -331,219 +415,284 @@ function App() {
 
     if (selectedImage) {
       const formData = new FormData();
-      formData.append('image', selectedImage);
-      formData.append('angle', angle);
+      formData.append("image", selectedImage);
+      formData.append("angle", angle);
 
       try {
         setActive(true); // Set active to true at the beginning of the try block
 
-        const response = await axios.post('http://localhost:5000/rotate', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/rotate",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setActive(false); // Set active to false at the end of the axios function
       }
     }
   };
 
-
   return (
-    <LoadingOverlay
-      active={isActive}
-      spinner
-      text='Loading your content...'
-    >
-      <div>
-        <Container>
+    <LoadingOverlay active={isActive} spinner text="Loading your content...">
+      <div className="mx-3">
+        <div className="text-center my-3">
+          <h1>GhoshaMaja</h1>
+        </div>
+
+        {!selectedImage && (
+          <Form>
+            <Form.Group>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </Form.Group>
+          </Form>
+        )}
+        {selectedImage && (
           <Row>
-            <Col xs={3} md={2}>
-              <div className='text-center my-5'>
-                <h1>Filters</h1>
+            <Col xs={12} md={2}>
+              <div className="text-center">
+                <h4>Filters</h4>
               </div>
-              <ListGroup>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Grayscale Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleGrayscale}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Average Blur Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleBlur}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Sobel Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleSobel}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Laplacian Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleLaplacian}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Unsharp Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleUnsharp}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Histogram Equalized Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleHistogramEqualized}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Old Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleOld}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Vignetting Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleVignetting}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Nightvision Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleNightvision}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Photocopy Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handlePhotocopy}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Mirror Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Button variant="outline-dark" onClick={handleMirror}>Apply</Button>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Posterize Image
-                  </div>
-                  <div className='my-3 text-center'>
-                  <Form>
-                      <Form.Group controlId="numColorInput">
-                        <Form.Label>Number of Color</Form.Label>
-                        <Form.Control
-                          type="number"
-                          value={numColor}
-                          onChange={e => setNumColor(e.target.value)}
-                          min={2}
-                          max={255}
-                          step={1}
-                        />
-                      </Form.Group>
-                      <div className='mt-3'>
-                        <Button variant="dark" type='submit' onClick={handlePosterize}>Rotate</Button>
-                      </div>
-                    </Form>
-                  </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className='my-3 text-center'>
-                    Rotate Image
-                  </div>
-                  <div className='my-3 text-center'>
-                    <Form>
-                      <Form.Group controlId="angleInput">
-                        <Form.Label>Angle</Form.Label>
-                        <Form.Control
-                          type="number"
-                          value={angle}
-                          onChange={e => setAngle(e.target.value)}
-                          min={1}
-                          max={360}
-                          step={1}
-                        />
-                      </Form.Group>
-                      <div className='mt-3'>
-                        <Button variant="dark" type='submit' onClick={handleRotate}>Rotate</Button>
-                      </div>
-                    </Form>
-                  </div>
-                </ListGroup.Item>
-              </ListGroup>
+              <div className="listgroup-container border border-2 rounded-2 mt-3">
+                <ListGroup>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Change Image</div>
+                    <div className="my-3 text-center">
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={handleImageChange}
+                      />
+                      <Button
+                        variant="outline-success"
+                        onClick={handleButtonClick}
+                      >
+                        Choose
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Grayscale Image</div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handleGrayscale}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  {/* <ListGroup.Item>
+                    <div className="my-3 text-center">Oil Painting Filter</div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handleOilPainting}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item> */}
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Average Blur Image</div>
+                    <div className="my-3 text-center">
+                      <Button variant="outline-success" onClick={handleBlur}>
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Sobel Image</div>
+                    <div className="my-3 text-center">
+                      <Button variant="outline-success" onClick={handleSobel}>
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Laplacian Image</div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handleLaplacian}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Unsharp Image</div>
+                    <div className="my-3 text-center">
+                      <Button variant="outline-success" onClick={handleUnsharp}>
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">
+                      Histogram Equalized Image
+                    </div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handleHistogramEqualized}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Old Image</div>
+                    <div className="my-3 text-center">
+                      <Button variant="outline-success" onClick={handleOld}>
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Vignetting Image</div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handleVignetting}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Nightvision Image</div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handleNightvision}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Photocopy Image</div>
+                    <div className="my-3 text-center">
+                      <Button
+                        variant="outline-success"
+                        onClick={handlePhotocopy}
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Mirror Image</div>
+                    <div className="my-3 text-center">
+                      <Button variant="outline-success" onClick={handleMirror}>
+                        Apply
+                      </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Posterize Image</div>
+                    <div className="my-3 text-center">
+                      <Form>
+                        <Form.Group controlId="numColorInput">
+                          <Form.Label>Number of Color</Form.Label>
+                          <Form.Control
+                            type="number"
+                            value={numColor}
+                            onChange={(e) => setNumColor(e.target.value)}
+                            min={2}
+                            max={255}
+                            step={1}
+                          />
+                        </Form.Group>
+                        <div className="mt-3">
+                          <Button
+                            variant="outline-success"
+                            type="submit"
+                            onClick={handlePosterize}
+                          >
+                            Apply
+                          </Button>
+                        </div>
+                      </Form>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Rotate Image</div>
+                    <div className="my-3 text-center">
+                      <Form>
+                        <Form.Group controlId="angleInput">
+                          <Form.Label>Angle</Form.Label>
+                          <Form.Control
+                            type="number"
+                            value={angle}
+                            onChange={(e) => setAngle(e.target.value)}
+                            min={1}
+                            max={360}
+                            step={1}
+                          />
+                        </Form.Group>
+                        <div className="mt-3">
+                          <Button
+                            variant="outline-success"
+                            type="submit"
+                            onClick={handleRotate}
+                          >
+                            Rotate
+                          </Button>
+                        </div>
+                      </Form>
+                    </div>
+                  </ListGroup.Item>
+                </ListGroup>
+              </div>
             </Col>
-            <Col xs={12} md={8}>
-              <div className='text-center my-5'>
-                <h1>Image Input</h1>
+            <Col xs={12} md={5}>
+              <div className="text-center">
+                <h4>Selected Image</h4>
               </div>
-              <Form>
-                <Form.Group>
-                  <Form.Control
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
+              {selectedImage && (
+                <div className="mt-3 text-center border border-4 rounded">
+                  <img
+                    src={URL.createObjectURL(selectedImage)}
+                    style={{ maxHeight: "80vh" }}
+                    alt="Selected"
+                    className="img-fluid"
                   />
-                  <div className='text-center my-5'>
-                    <h1>Selected Image</h1>
-                  </div>
-                  {selectedImage && (
-                    <div className="mt-3 text-center">
-                      <img
-                        src={URL.createObjectURL(selectedImage)}
-                        alt="Selected"
-                        className="img-fluid"
-                      />
-                    </div>
-                  )}
-                  <div className='text-center my-5'>
-                    <h1>Processed Image</h1>
-                  </div>
-                  {responseImage && (
-                    <div className="mt-3 text-center">
-                      <img
-                        src={`data:image/jpeg;base64,${responseImage}`}
-                        alt="Processed"
-                        className="img-fluid"
-                      />
-                    </div>
-                  )}
-                </Form.Group>
-              </Form>
+                </div>
+              )}
+            </Col>
+            <Col xs={12} md={5}>
+              <div className="text-center">
+                <h4>Processed Image</h4>
+              </div>
+              {responseImage && (
+                <div className="mt-3 text-center border border-4 rounded">
+                  <img
+                    src={`data:image/jpeg;base64,${responseImage}`}
+                    style={{ maxHeight: "80vh" }}
+                    alt="Processed"
+                    className="img-fluid"
+                  />
+                </div>
+              )}
             </Col>
           </Row>
-        </Container>
+        )}
       </div>
     </LoadingOverlay>
   );

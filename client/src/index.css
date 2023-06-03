@@ -11,3 +11,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.listgroup-container {
+  max-height: 80vh;
+  /* Adjust the height as needed */
+  overflow-y: auto;
+}
+
+.listgroup-scroll {
+  flex-wrap: nowrap;
+}

@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from PIL import Image
+from PIL import Image, ImageFilter
 import io
 import base64
 from flask_cors import CORS
@@ -54,6 +54,35 @@ def blur():
         image.save(buffered, format=format)
         encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
+        return jsonify({'image': encoded_image})
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+@app.route('/oil', methods=['POST'])
+def oil_painting_filter():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'})
+
+    image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({'error': 'Invalid image file'})
+    
+    try:
+        # Open the image
+        image = Image.open(image_file)
+        # Apply the Oil Painting filter
+        oil_painting = image.filter(ImageFilter.EMBOSS)
+
+        # Adjust the intensity of the filter
+        oil_painting = oil_painting.point(lambda i: i * 2)
+
+        # Apply the brush size
+        oil_painting = oil_painting.filter(ImageFilter.MaxFilter(11))
+
+        # Save the filtered image
+        buffered = io.BytesIO()
+        oil_painting.save(buffered, format=format)
+        encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
         return jsonify({'image': encoded_image})
     except Exception as e:
         return jsonify({'error': str(e)})
