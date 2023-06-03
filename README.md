@@ -6,7 +6,7 @@ This guide will walk you through the steps to set up and run a Flask and React p
 
 Before you begin, ensure that you have the following installed on your system:
 
-- Python 3.8 or higher
+- Python 3.11 or higher
 - Node.js 18 or higher
 - npm (Node Package Manager) 
 
