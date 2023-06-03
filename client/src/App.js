@@ -5,6 +5,7 @@ import { Row, Col, ListGroup, Button } from "react-bootstrap";
 import axios from "axios";
 import LoadingOverlay from "react-loading-overlay-ts";
 import RangeSlider from "react-bootstrap-range-slider";
+import DownloadButton from "./DownloadButton";
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -444,9 +445,11 @@ function App() {
   return (
     <LoadingOverlay active={isActive} spinner text="Loading your content...">
       <div className="mx-3">
-        <div className="text-center my-3">
-          <h1>GhoshaMaja</h1>
-        </div>
+        {selectedImage && (
+          <div className="text-center my-3">
+            <h1>GhoshaMaja</h1>
+          </div>
+        )}
 
         {!selectedImage && (
           <Form>
@@ -454,8 +457,31 @@ function App() {
               <Form.Control
                 type="file"
                 accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
                 onChange={handleImageChange}
               />
+              <div
+                style={{ minHeight: "80vh" }}
+                className="d-flex justify-content-center align-items-center"
+              >
+                <div class="card p-5">
+                  <h3 class="card-header text-center">GhoshaMaja</h3>
+                  <div class="card-body text-center p-5">
+                    <h5 class="card-title">
+                      Easily Upload and Enhance Your Photos with our Simple and
+                      Reliable GhoshaMaja App!
+                    </h5>
+                    <Button
+                      className="mt-3"
+                      variant="outline-success"
+                      onClick={handleButtonClick}
+                    >
+                      Browse & Upload
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </Form.Group>
           </Form>
         )}
@@ -677,18 +703,23 @@ function App() {
               )}
             </Col>
             <Col xs={12} md={5}>
-              <div className="text-center">
-                <h4>Processed Image</h4>
-              </div>
               {responseImage && (
-                <div className="mt-3 text-center border border-4 rounded">
-                  <img
-                    src={`data:image/jpeg;base64,${responseImage}`}
-                    style={{ maxHeight: "80vh" }}
-                    alt="Processed"
-                    className="img-fluid"
-                  />
-                </div>
+                <>
+                  <div className="d-flex justify-content-center">
+                    <h4 className="me-3">Processed Image</h4>
+                    <div>
+                      <DownloadButton base64Image={responseImage} />
+                    </div>
+                  </div>
+                  <div className="mt-2 text-center border border-4 rounded">
+                    <img
+                      src={`data:image/jpeg;base64,${responseImage}`}
+                      style={{ maxHeight: "80vh" }}
+                      alt="Processed"
+                      className="img-fluid"
+                    />
+                  </div>
+                </>
               )}
             </Col>
           </Row>
