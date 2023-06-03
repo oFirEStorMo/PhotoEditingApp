@@ -23,7 +23,7 @@ def process_image():
         
         # Convert the processed image to base64 string
         buffered = io.BytesIO()
-        image.save(buffered, format='JPEG')
+        image.save(buffered, format=image.format)
         encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
         return jsonify({'image': encoded_image})
