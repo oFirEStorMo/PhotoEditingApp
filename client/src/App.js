@@ -3,17 +3,20 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import { Row, Col, ListGroup, Button } from 'react-bootstrap';
 import axios from 'axios';
+import LoadingOverlay from 'react-loading-overlay-ts';
+
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [responseImage, setResponseImage] = useState(null);
+  const [isActive, setActive] = useState(false)
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setSelectedImage(file);
   };
 
-  const handleGrayscale = async (e) => {
+  const handleBlur = async (e) => {
     e.preventDefault();
 
     if (selectedImage) {
@@ -21,11 +24,13 @@ function App() {
       formData.append('image', selectedImage);
 
       try {
-        const response = await axios.post('http://localhost:5000/grayscale_api', formData, {
+        setActive(true);
+        const response = await axios.post('http://localhost:5000/blur', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        });
+        })
+        setActive(false);
 
         setResponseImage(response.data.image);
         // console.log(response.data.image)
@@ -35,70 +40,407 @@ function App() {
     }
   };
 
+  const handleSobel = async (e) => {
+    e.preventDefault();
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+
+      try {
+        setActive(true);
+        const response = await axios.post('http://localhost:5000/sobel', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setActive(false);
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  };
+
+  const handleLaplacian = async (e) => {
+    e.preventDefault();
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+
+      try {
+        setActive(true);
+        const response = await axios.post('http://localhost:5000/laplacian', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setActive(false);
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  };
+
+  const handleUnsharp = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/unsharp', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handleHistogramEqualized = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/histogram', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handleOld = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/old', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handleVignetting = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/vignetting_api', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handlePhotocopy = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/photocopy_api', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handleNightvision = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/nightvision_api', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handleMirror = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/mirror_api', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+  const handleGrayscale = async (e) => {
+    e.preventDefault();
+  
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+  
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+  
+        const response = await axios.post('http://localhost:5000/grayscale_api', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+  
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+  
+
   return (
-    <div>
-      <Container>
-        <Row>
-          <Col xs={3} md={2}>
-            <div className='text-center my-5'>
-              <h1>Filters</h1>
-            </div>
-            <ListGroup>
-              <ListGroup.Item>
-                <div className='my-3 text-center'>
-                  Grayscale Image
-                </div>
-                <div className='my-3 text-center'>
-                  <Button variant="outline-dark" onClick={handleGrayscale}>Apply</Button>
-                </div>
-              </ListGroup.Item>
-              <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-              <ListGroup.Item>Morbi leo risus</ListGroup.Item>
-              <ListGroup.Item>Porta ac consectetur ac</ListGroup.Item>
-              <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
-            </ListGroup>
-          </Col>
-          <Col xs={12} md={8}>
-            <div className='text-center my-5'>
-              <h1>Image Input</h1>
-            </div>
-            <Form>
-              <Form.Group>
-                <Form.Control
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                <div className='text-center my-5'>
-                  <h1>Selected Image</h1>
-                </div>
-                {selectedImage && (
-                  <div className="mt-3 text-center">
-                    <img
-                      src={URL.createObjectURL(selectedImage)}
-                      alt="Selected"
-                      className="img-fluid"
-                    />
+    <LoadingOverlay
+      active={isActive}
+      spinner
+      text='Loading your content...'
+    >
+      <div>
+        <Container>
+          <Row>
+            <Col xs={3} md={2}>
+              <div className='text-center my-5'>
+                <h1>Filters</h1>
+              </div>
+              <ListGroup>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Grayscale Image
                   </div>
-                )}
-                <div className='text-center my-5'>
-                  <h1>Processed Image</h1>
-                </div>
-                {responseImage && (
-                  <div className="mt-3 text-center">
-                    <img
-                      src={`data:image/jpeg;base64,${responseImage}`}
-                      alt="Processed"
-                      className="img-fluid"
-                    />
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleGrayscale}>Apply</Button>
                   </div>
-                )}
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Average Blur Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleBlur}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Sobel Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleSobel}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Laplacian Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleLaplacian}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Unsharp Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleUnsharp}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Histogram Equalized Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleHistogramEqualized}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Old Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleOld}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Vignetting Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleVignetting}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Nightvision Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleNightvision}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Photocopy Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handlePhotocopy}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className='my-3 text-center'>
+                    Mirror Image
+                  </div>
+                  <div className='my-3 text-center'>
+                    <Button variant="outline-dark" onClick={handleMirror}>Apply</Button>
+                  </div>
+                </ListGroup.Item>
+              </ListGroup>
+            </Col>
+            <Col xs={12} md={8}>
+              <div className='text-center my-5'>
+                <h1>Image Input</h1>
+              </div>
+              <Form>
+                <Form.Group>
+                  <Form.Control
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  <div className='text-center my-5'>
+                    <h1>Selected Image</h1>
+                  </div>
+                  {selectedImage && (
+                    <div className="mt-3 text-center">
+                      <img
+                        src={URL.createObjectURL(selectedImage)}
+                        alt="Selected"
+                        className="img-fluid"
+                      />
+                    </div>
+                  )}
+                  <div className='text-center my-5'>
+                    <h1>Processed Image</h1>
+                  </div>
+                  {responseImage && (
+                    <div className="mt-3 text-center">
+                      <img
+                        src={`data:image/jpeg;base64,${responseImage}`}
+                        alt="Processed"
+                        className="img-fluid"
+                      />
+                    </div>
+                  )}
+                </Form.Group>
+              </Form>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+    </LoadingOverlay>
   );
 }
 

@@ -4,15 +4,12 @@ from skimage import morphology
 import math
 
 def grayscale(image):
-    width, height = image.size
-    grayscale_image = Image.new('L', (width, height))
-
-    for x in range(width):
-        for y in range(height):
-            r, g, b = image.getpixel((x, y))
-            # Calculate grayscale value using average of RGB values
-            gray = int((r + g + b) / 3)
-            grayscale_image.putpixel((x, y), gray)
+    img_array = np.array(image)
+    if img_array.ndim == 3:
+        gray_array = np.dot(img_array[..., :3], [0.2989, 0.5870, 0.1140]).astype(np.uint8)
+        grayscale_image = Image.fromarray(gray_array, mode='L')
+    else:
+        grayscale_image = image.convert('L')
 
     return grayscale_image
 
@@ -67,32 +64,35 @@ def canny_edge_detection(image, low_threshold=20, high_threshold=50):
     gradient_image = sobel_operator(grayscale_image)
     canny_image = Image.new('L', (width, height), 0)
 
+    # Convert gradient_image to NumPy array
+    gradient_array = np.array(gradient_image, dtype=np.float32)
+
     for x in range(1, width - 1):
         for y in range(1, height - 1):
-            pixel = gradient_image.getpixel((x, y))
+            pixel = gradient_array[y, x]
             if pixel >= high_threshold:
                 canny_image.putpixel((x, y), 255)
             elif low_threshold <= pixel < high_threshold:
-                if any(gradient_image.getpixel((x + dx, y + dy)) >= high_threshold
-                       for dx in range(-1, 2) for dy in range(-1, 2)):
+                if np.any(gradient_array[y-1:y+2, x-1:x+2] >= high_threshold):
                     canny_image.putpixel((x, y), 255)
 
     return canny_image
-
 
 def laplacian_filter(image):
     width, height = image.size
     grayscale_image = image.convert('L')
     filtered_image = Image.new('L', (width, height))
 
-    laplacian = [[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]]
+    laplacian = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
+
+    # Convert grayscale_image to NumPy array
+    grayscale_array = np.array(grayscale_image, dtype=np.float32)
 
     for x in range(1, width - 1):
         for y in range(1, height - 1):
-            pixel = sum([grayscale_image.getpixel((x + dx, y + dy)) * laplacian[dy][dx]
-                         for dx in range(-1, 2) for dy in range(-1, 2)])
+            pixel = np.sum(grayscale_array[y-1:y+2, x-1:x+2] * laplacian)
             pixel = max(0, min(pixel, 255))
-            filtered_image.putpixel((x, y), pixel)
+            filtered_image.putpixel((x, y), int(pixel))
 
     return filtered_image
 
@@ -101,10 +101,14 @@ def unsharp_masking(image, strength=2):
     blurred_image = averaging_blur(image)
     sharpened_image = Image.new('RGB', image.size)
 
+    # Convert images to NumPy arrays
+    image_array = np.array(image, dtype=np.float32)
+    blurred_array = np.array(blurred_image, dtype=np.float32)
+
     for x in range(image.width):
         for y in range(image.height):
-            r, g, b = image.getpixel((x, y))
-            br, bg, bb = blurred_image.getpixel((x, y))
+            r, g, b = image_array[y, x]
+            br, bg, bb = blurred_array[y, x]
             # Subtracting the blurred image from the original image
             sr = int(max(0, min(r + strength * (r - br), 255)))
             sg = int(max(0, min(g + strength * (g - bg), 255)))
@@ -117,30 +121,27 @@ def unsharp_masking(image, strength=2):
 def histogram_equalization(image):
     grayscale_image = image.convert('L')
     width, height = grayscale_image.size
-    histogram = [0] * 256
+    histogram = np.zeros(256, dtype=np.int32)
 
     # Calculate histogram
-    for x in range(width):
-        for y in range(height):
-            pixel = grayscale_image.getpixel((x, y))
-            histogram[pixel] += 1
+    pixels = np.array(grayscale_image).flatten()
+    for pixel in pixels:
+        histogram[pixel] += 1
 
     # Calculate cumulative distribution function (CDF)
-    cdf = [sum(histogram[:i + 1]) for i in range(256)]
+    cdf = np.cumsum(histogram)
 
     # Scale CDF to the range [0, 255]
-    cdf_min = min(cdf)
-    cdf_max = max(cdf)
-    scaled_cdf = [int((cdf[i] - cdf_min) * 255 / (cdf_max - cdf_min)) for i in range(256)]
+    cdf_min = np.min(cdf)
+    cdf_max = np.max(cdf)
+    scaled_cdf = ((cdf - cdf_min) * 255 / (cdf_max - cdf_min)).astype(np.uint8)
 
     equalized_image = Image.new('L', (width, height))
 
     # Apply equalization to each pixel
-    for x in range(width):
-        for y in range(height):
-            pixel = grayscale_image.getpixel((x, y))
-            equalized_pixel = scaled_cdf[pixel]
-            equalized_image.putpixel((x, y), equalized_pixel)
+    pixels = np.array(grayscale_image)
+    equalized_pixels = scaled_cdf[pixels]
+    equalized_image.putdata(equalized_pixels.flatten())
 
     return equalized_image
 
@@ -148,29 +149,40 @@ def histogram_equalization(image):
 def thresholding(image, threshold=128):
     grayscale_image = image.convert('L')
     width, height = grayscale_image.size
-    binary_image = Image.new('1', (width, height), 0)
+    binary_pixels = np.zeros((height, width), dtype=np.uint8)
 
-    for x in range(width):
-        for y in range(height):
-            pixel = grayscale_image.getpixel((x, y))
-            if pixel >= threshold:
-                binary_image.putpixel((x, y), 1)
+    pixels = np.array(grayscale_image)
 
+    # Apply thresholding
+    binary_pixels[pixels >= threshold] = 1
+
+    binary_image = Image.fromarray(binary_pixels, mode='1')
     return binary_image
 
 def median_filter(image, size=3):
     width, height = image.size
     filtered_image = image.copy()
 
-    for x in range(size // 2, width - size // 2):
-        for y in range(size // 2, height - size // 2):
-            pixels = [
-                image.getpixel((x + dx, y + dy))
-                for dx in range(-size // 2, size // 2 + 1)
-                for dy in range(-size // 2, size // 2 + 1)
-            ]
-            median_pixel = sorted(pixels)[len(pixels) // 2]
-            filtered_image.putpixel((x, y), median_pixel)
+    if image.mode == 'RGB':
+        for x in range(size // 2, width - size // 2):
+            for y in range(size // 2, height - size // 2):
+                window = [
+                    image.getpixel((x + dx, y + dy))
+                    for dx in range(-size // 2, size // 2 + 1)
+                    for dy in range(-size // 2, size // 2 + 1)
+                ]
+                median_pixel = np.median(window, axis=0)
+                filtered_image.putpixel((x, y), tuple(median_pixel.astype(int)))
+    else:
+        for x in range(size // 2, width - size // 2):
+            for y in range(size // 2, height - size // 2):
+                window = [
+                    image.getpixel((x + dx, y + dy))
+                    for dx in range(-size // 2, size // 2 + 1)
+                    for dy in range(-size // 2, size // 2 + 1)
+                ]
+                median_pixel = np.median(window)
+                filtered_image.putpixel((x, y), int(median_pixel))
 
     return filtered_image
 
@@ -178,13 +190,19 @@ def brightness_adjustment(image, factor):
     width, height = image.size
     adjusted_image = image.copy()
 
-    for x in range(width):
-        for y in range(height):
-            r, g, b = image.getpixel((x, y))
-            r = int(max(0, min(r + factor, 255)))
-            g = int(max(0, min(g + factor, 255)))
-            b = int(max(0, min(b + factor, 255)))
-            adjusted_image.putpixel((x, y), (r, g, b))
+    if image.mode == 'RGB':
+        pixel_array = np.array(image)
+        pixel_array = pixel_array.astype(np.float32)
+        pixel_array += factor
+        pixel_array = np.clip(pixel_array, 0, 255)
+        pixel_array = pixel_array.astype(np.uint8)
+        adjusted_image = Image.fromarray(pixel_array, mode='RGB')
+    else:
+        for x in range(width):
+            for y in range(height):
+                pixel = image.getpixel((x, y))
+                adjusted_pixel = int(max(0, min(pixel + factor, 255)))
+                adjusted_image.putpixel((x, y), adjusted_pixel)
 
     return adjusted_image
 
@@ -192,13 +210,21 @@ def contrast_adjustment(image, factor):
     width, height = image.size
     adjusted_image = image.copy()
 
-    for x in range(width):
-        for y in range(height):
-            r, g, b = image.getpixel((x, y))
-            r = int(max(0, min((r - 128) * factor + 128, 255)))
-            g = int(max(0, min((g - 128) * factor + 128, 255)))
-            b = int(max(0, min((b - 128) * factor + 128, 255)))
-            adjusted_image.putpixel((x, y), (r, g, b))
+    if image.mode == 'RGB':
+        pixel_array = np.array(image)
+        pixel_array = pixel_array.astype(np.float32)
+        pixel_array -= 128  # Shift pixel values by 128
+        pixel_array *= factor
+        pixel_array += 128
+        pixel_array = np.clip(pixel_array, 0, 255)
+        pixel_array = pixel_array.astype(np.uint8)
+        adjusted_image = Image.fromarray(pixel_array, mode='RGB')
+    else:
+        for x in range(width):
+            for y in range(height):
+                pixel = image.getpixel((x, y))
+                adjusted_pixel = int(max(0, min((pixel - 128) * factor + 128, 255)))
+                adjusted_image.putpixel((x, y), adjusted_pixel)
 
     return adjusted_image
 
@@ -209,28 +235,25 @@ def rotate_image(image, angle):
     cos_theta = math.cos(angle_rad)
     sin_theta = math.sin(angle_rad)
 
-    # Calculate new image size
-    new_width = int(math.ceil(abs(width * cos_theta) + abs(height * sin_theta)))
-    new_height = int(math.ceil(abs(width * sin_theta) + abs(height * cos_theta)))
+    # Create a grid of coordinates for the new image
+    new_coords_x, new_coords_y = np.meshgrid(range(width), range(height))
+    new_coords_x -= width // 2
+    new_coords_y -= height // 2
 
-    # Create a blank image with the new size
-    rotated_image = Image.new('RGB', (new_width, new_height), (0, 0, 0))
+    # Apply the rotation transformation to the coordinates
+    original_coords_x = np.round(new_coords_x * cos_theta + new_coords_y * sin_theta + width // 2).astype(int)
+    original_coords_y = np.round(-new_coords_x * sin_theta + new_coords_y * cos_theta + height // 2).astype(int)
 
-    # Calculate the center point of the new image
-    center_x = new_width // 2
-    center_y = new_height // 2
+    # Mask to ensure only valid coordinates are used
+    valid_mask = (original_coords_x >= 0) & (original_coords_x < width) & (original_coords_y >= 0) & (original_coords_y < height)
 
-    for x in range(new_width):
-        for y in range(new_height):
-            # Calculate the original coordinates of the pixel in the rotated image
-            original_x = int((x - center_x) * cos_theta + (y - center_y) * sin_theta + width / 2)
-            original_y = int(-(x - center_x) * sin_theta + (y - center_y) * cos_theta + height / 2)
+    # Get the pixel values from the original image using the transformed coordinates
+    original_pixels = np.array(image)
+    rotated_pixels = np.zeros_like(original_pixels)
+    rotated_pixels[new_coords_y[valid_mask], new_coords_x[valid_mask]] = original_pixels[original_coords_y[valid_mask], original_coords_x[valid_mask]]
 
-            # Check if the original coordinates are within the bounds of the original image
-            if 0 <= original_x < width and 0 <= original_y < height:
-                # Get the pixel value from the original image and set it in the rotated image
-                pixel = image.getpixel((original_x, original_y))
-                rotated_image.putpixel((x, y), pixel)
+    # Create a new PIL image from the rotated pixel values
+    rotated_image = Image.fromarray(rotated_pixels, mode='RGB')
 
     return rotated_image
 
@@ -260,108 +283,129 @@ def close_operation(image, size=3):
 
     return closed_pil_image
 
+import math
+import numpy as np
+from PIL import Image
+
 def posterize(image, num_colors):
     # Convert image to RGB mode
     image_rgb = image.convert('RGB')
 
     # Calculate the step size between each quantized color level
-    step_size = 255//num_colors
+    step_size = 255 // num_colors
 
-    # Create a blank output image
-    output_image = Image.new('RGB', image.size)
+    # Create a numpy array from the image
+    pixels = np.array(image_rgb)
 
-    # Apply posterize filter
-    for x in range(image.width):
-        for y in range(image.height):
-            r, g, b = image_rgb.getpixel((x, y))
-            out_r = math.floor(r//step_size)*step_size + (step_size//2)
-            out_g = math.floor(g//step_size)*step_size + (step_size//2)
-            out_b = math.floor(b//step_size)*step_size + (step_size//2)
-            output_image.putpixel((x, y), (int(out_r), int(out_g), int(out_b)))
+    # Apply posterize filter using numpy operations
+    out_pixels = np.floor(pixels // step_size) * step_size + (step_size // 2)
+
+    # Create a new PIL image from the output pixel values
+    output_image = Image.fromarray(out_pixels.astype('uint8'), mode='RGB')
 
     return output_image
+
 
 def old_image(image):
-    # Create a blank output image
-    output_image = Image.new('RGB', image.size)
-    
-    # Apply old image filter
-    for x in range(image.width):
-        for y in range(image.height):
-            r, g, b = image.getpixel((x, y))
-            out_r = int(r * 0.393 + g * 0.769 + b * 0.189)
-            out_g = int(r * 0.349 + g * 0.686 + b * 0.168)
-            out_b = int(r * 0.272 + g * 0.534 + b * 0.131)
-            output_image.putpixel((x, y), (out_r, out_g, out_b))
-    
+    # Convert image to RGB mode
+    image_rgb = image.convert('RGB')
+
+    # Create a numpy array from the image
+    pixels = np.array(image_rgb)
+
+    # Apply old image filter using numpy operations
+    out_pixels = np.zeros_like(pixels)
+    out_pixels[:, :, 0] = np.clip(pixels[:, :, 0] * 0.393 + pixels[:, :, 1] * 0.769 + pixels[:, :, 2] * 0.189, 0, 255)
+    out_pixels[:, :, 1] = np.clip(pixels[:, :, 0] * 0.349 + pixels[:, :, 1] * 0.686 + pixels[:, :, 2] * 0.168, 0, 255)
+    out_pixels[:, :, 2] = np.clip(pixels[:, :, 0] * 0.272 + pixels[:, :, 1] * 0.534 + pixels[:, :, 2] * 0.131, 0, 255)
+
+    # Create a new PIL image from the output pixel values
+    output_image = Image.fromarray(out_pixels.astype('uint8'), mode='RGB')
+
     return output_image
 
-
 def vignetting(image):
-    # Create a blank output image
-    output_image = Image.new('RGB', image.size)
-    
+    # Convert image to RGB mode
+    image_rgb = image.convert('RGB')
+
+    # Create a numpy array from the image
+    pixels = np.array(image_rgb)
+
+    # Create meshgrid of coordinates
+    x_coords, y_coords = np.meshgrid(np.arange(image.width), np.arange(image.height))
+
     # Calculate maximum distance from center
     max_distance = max(image.width // 2, image.height // 2)
-    
-    # Apply vignetting filter
-    for x in range(image.width):
-        for y in range(image.height):
-            distance = ((x - image.width // 2) ** 2 + (y - image.height // 2) ** 2) ** 0.5
-            factor = 1 - distance / max_distance
-            pixel = image.getpixel((x, y))
-            output_pixel = tuple(int(value * factor) for value in pixel)
-            output_image.putpixel((x, y), output_pixel)
-    
+
+    # Calculate distance from center for each pixel
+    distance = np.sqrt((x_coords - image.width // 2) ** 2 + (y_coords - image.height // 2) ** 2)
+
+    # Calculate factor for each pixel
+    factor = 1 - distance / max_distance
+
+    # Apply vignetting filter using numpy operations
+    out_pixels = np.multiply(pixels, factor[..., np.newaxis])
+    out_pixels = np.clip(out_pixels, 0, 255)
+
+    # Create a new PIL image from the output pixel values
+    output_image = Image.fromarray(out_pixels.astype('uint8'), mode='RGB')
+
     return output_image
 
 
 def photocopy(image, threshold=128):
     # Convert image to grayscale
     grayscale_image = image.convert('L')
-    
-    # Create a blank output image
-    output_image = Image.new('L', image.size)
-    
-    # Apply photocopy filter
-    for x in range(image.width):
-        for y in range(image.height):
-            pixel_value = grayscale_image.getpixel((x, y))
-            if pixel_value > threshold:
-                output_image.putpixel((x, y), 255)
-            else:
-                output_image.putpixel((x, y), pixel_value * (threshold - pixel_value) // threshold ** 2)
-    
+
+    # Create a numpy array from the grayscale image
+    pixels = np.array(grayscale_image)
+
+    # Create a blank output image as a numpy array
+    output_pixels = np.zeros_like(pixels)
+
+    # Apply photocopy filter using numpy operations
+    mask = pixels > threshold
+    output_pixels[mask] = 255
+    output_pixels[~mask] = pixels[~mask] * (threshold - pixels[~mask]) // threshold ** 2
+
+    # Create a new PIL image from the output pixel values
+    output_image = Image.fromarray(output_pixels, mode='L')
+
     return output_image
 
 def night_vision(image):
     # Convert image to RGB mode
     image_rgb = image.convert('RGB')
-    
-    # Create a blank output image
-    output_image = Image.new('RGB', image.size)
-    
-    # Apply night vision filter
-    for x in range(image.width):
-        for y in range(image.height):
-            r, g, b = image_rgb.getpixel((x, y))
-            out_r = g // 2
-            out_b = 2 * out_r
-            out_g = 2 * out_b
-            output_image.putpixel((x, y), (out_r, out_g, out_b))
-    
+
+    # Create a numpy array from the RGB image
+    pixels = np.array(image_rgb)
+
+    # Create a blank output image as a numpy array
+    output_pixels = np.zeros_like(pixels)
+
+    # Apply night vision filter using numpy operations
+    output_pixels[:, :, 0] = pixels[:, :, 1] // 2
+    output_pixels[:, :, 2] = 2 * output_pixels[:, :, 0]
+    output_pixels[:, :, 1] = 2 * output_pixels[:, :, 2]
+
+    # Create a new PIL image from the output pixel values
+    output_image = Image.fromarray(output_pixels)
+
     return output_image
 
 def mirror(image):
-    # Create a blank output image
-    output_image = Image.new('RGB', image.size)
-    
-    # Apply mirror filter
-    for x in range(image.width):
-        for y in range(image.height):
-            pixel = image.getpixel((x, y))
-            output_image.putpixel((image.width - x - 1, y), pixel)
-    
+    # Create a numpy array from the image
+    pixels = np.array(image)
+
+    # Create a blank output image as a numpy array
+    output_pixels = np.zeros_like(pixels)
+
+    # Apply mirror filter using array slicing
+    output_pixels[:, :] = pixels[:, ::-1]
+
+    # Create a new PIL image from the output pixel values
+    output_image = Image.fromarray(output_pixels)
+
     return output_image
 
 
