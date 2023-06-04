@@ -98,8 +98,14 @@ def laplacian_filter(image):
 
 
 def unsharp_masking(image, strength=2):
+    # Check if the image is RGB or grayscale
+    is_rgb = image.mode == 'RGB'
+
+    # Apply averaging blur to the image
     blurred_image = averaging_blur(image)
-    sharpened_image = Image.new('RGB', image.size)
+
+    # Create a new image for the sharpened result
+    sharpened_image = Image.new(image.mode, image.size)
 
     # Convert images to NumPy arrays
     image_array = np.array(image, dtype=np.float32)
@@ -107,15 +113,26 @@ def unsharp_masking(image, strength=2):
 
     for x in range(image.width):
         for y in range(image.height):
-            r, g, b = image_array[y, x]
-            br, bg, bb = blurred_array[y, x]
+            # Get the pixel values from the original and blurred image
+            if is_rgb:
+                r, g, b = image_array[y, x]
+                br, bg, bb = blurred_array[y, x]
+            else:
+                # For grayscale images, use the same pixel value for all channels
+                r = g = b = image_array[y, x]
+                br = bg = bb = blurred_array[y, x]
+
             # Subtracting the blurred image from the original image
             sr = int(max(0, min(r + strength * (r - br), 255)))
             sg = int(max(0, min(g + strength * (g - bg), 255)))
             sb = int(max(0, min(b + strength * (b - bb), 255)))
-            sharpened_image.putpixel((x, y), (sr, sg, sb))
+
+            # Set the sharpened pixel value in the output image
+            sharpened_pixel = (sr, sg, sb) if is_rgb else sr
+            sharpened_image.putpixel((x, y), sharpened_pixel)
 
     return sharpened_image
+
 
 
 def histogram_equalization(image):

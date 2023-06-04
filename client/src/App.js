@@ -15,6 +15,7 @@ function App() {
   const [angle, setAngle] = React.useState(360);
   const [brightness, setBrightness] = useState(0);
   const [contrast, setContrast] = useState(1);
+  const [imageFormat, setImageFormat] = useState('');
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {
@@ -23,6 +24,7 @@ function App() {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    setImageFormat(file.type)
     setSelectedImage(file);
   };
 
@@ -509,6 +511,25 @@ function App() {
     }
   };
 
+  const handleOnClick = e => {
+    // setImageType('edit');
+    const base64Data = responseImage.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+
+  // Decode the base64 data
+  const binaryData = atob(base64Data);
+
+  // Create an ArrayBuffer from the binary data
+  const arrayBuffer = new ArrayBuffer(binaryData.length);
+  const uint8Array = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < binaryData.length; i++) {
+    uint8Array[i] = binaryData.charCodeAt(i);
+  }
+
+  // Create a Blob object from the ArrayBuffer
+  const blob = new Blob([uint8Array], { type: imageFormat }); // Change the MIME type if necessary
+    setSelectedImage(blob);
+  }
+
   return (
     <LoadingOverlay active={isActive} spinner text="Loading your content...">
       <div className="mx-3">
@@ -800,6 +821,7 @@ function App() {
                     <h4 className="me-3">Processed Image</h4>
                     <div>
                       <DownloadButton base64Image={responseImage} />
+                      <button className="btn btn-sm ms-3 btn-outline-success" onClick={handleOnClick}>Save and Apply More</button>
                     </div>
                   </div>
                   <div className="mt-2 text-center border border-4 rounded">
