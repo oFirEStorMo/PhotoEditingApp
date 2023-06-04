@@ -366,6 +366,60 @@ def rotate():
         print(e)
         return jsonify({'error': str(e)})
     
+@app.route('/brightness', methods=['POST'])
+def brightness():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'})
+
+    image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({'error': 'Invalid image file'})
+
+    try:
+        # Open and process the image
+        image = Image.open(image_file)
+        format = image.format
+        # Perform your image processing tasks here using the 'image' object
+        image = brightness_adjustment(image, request.form['factor'])
+        # print(image)
+        
+        # Convert the processed image to base64 string
+        buffered = io.BytesIO()
+        image.save(buffered, format=format)
+        encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        return jsonify({'image': encoded_image})
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)})
+    
+@app.route('/contrast', methods=['POST'])
+def contrast():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image file provided'})
+
+    image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({'error': 'Invalid image file'})
+
+    try:
+        # Open and process the image
+        image = Image.open(image_file)
+        format = image.format
+        # Perform your image processing tasks here using the 'image' object
+        image = contrast_adjustment(image, request.form['factor'])
+        # print(image)
+        
+        # Convert the processed image to base64 string
+        buffered = io.BytesIO()
+        image.save(buffered, format=format)
+        encoded_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+        return jsonify({'image': encoded_image})
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)})
+    
 
 if __name__ == '__main__':
     app.run()

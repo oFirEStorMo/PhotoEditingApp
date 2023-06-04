@@ -13,6 +13,8 @@ function App() {
   const [isActive, setActive] = useState(false);
   const [numColor, setNumColor] = React.useState(16);
   const [angle, setAngle] = React.useState(360);
+  const [brightness, setBrightness] = useState(0);
+  const [contrast, setContrast] = useState(1);
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {
@@ -442,6 +444,71 @@ function App() {
     }
   };
 
+  const handleBrightness = async (e) => {
+    e.preventDefault();
+    // console.log(numColor);
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append("image", selectedImage);
+      formData.append("factor", brightness);
+
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+
+        const response = await axios.post(
+          "http://localhost:5000/brightness",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        console.log(response);
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+
+  const handleContrast = async (e) => {
+    e.preventDefault();
+    // console.log(numColor);
+
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append("image", selectedImage);
+      formData.append("factor", contrast);
+
+      try {
+        setActive(true); // Set active to true at the beginning of the try block
+
+        const response = await axios.post(
+          "http://localhost:5000/contrast",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        setResponseImage(response.data.image);
+        // console.log(response.data.image)
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setActive(false); // Set active to false at the end of the axios function
+      }
+    }
+  };
+
   return (
     <LoadingOverlay active={isActive} spinner text="Loading your content...">
       <div className="mx-3">
@@ -509,6 +576,30 @@ function App() {
                       >
                         Choose
                       </Button>
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Brightness</div>
+                    <div className="my-3 text-center">
+                      <RangeSlider min={-100} max={100} value={brightness} onChange={e=>{setBrightness(e.target.value)}} onAfterChange={handleBrightness} />
+                      {/* <Button
+                        variant="outline-success"
+                        onClick={handleBrightness}
+                      >
+                        Apply
+                      </Button> */}
+                    </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="my-3 text-center">Contrast</div>
+                    <div className="my-3 text-center">
+                    <RangeSlider min={0.1} max={4} step={0.1} value={contrast} onChange={e=>{setContrast(e.target.value)}} onAfterChange={handleContrast} />
+                      {/* <Button
+                        variant="outline-success"
+                        onClick={handleContrast}
+                      >
+                        Apply
+                      </Button> */}
                     </div>
                   </ListGroup.Item>
                   <ListGroup.Item>

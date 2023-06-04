@@ -190,6 +190,8 @@ def brightness_adjustment(image, factor):
     width, height = image.size
     adjusted_image = image.copy()
 
+    factor = int(factor)
+
     if image.mode == 'RGB':
         pixel_array = np.array(image)
         pixel_array = pixel_array.astype(np.float32)
@@ -209,6 +211,8 @@ def brightness_adjustment(image, factor):
 def contrast_adjustment(image, factor):
     width, height = image.size
     adjusted_image = image.copy()
+
+    factor = float(factor)
 
     if image.mode == 'RGB':
         pixel_array = np.array(image)
@@ -415,7 +419,7 @@ def mirror(image):
 
 
 # Usage example:
-# image = Image.open('mirror_in.jpg')
+# image = Image.open('img.jpg')
 
 # # Apply grayscale filter
 # grayscale_image = grayscale(image)
@@ -448,3 +452,6 @@ def mirror(image):
 # # Apply thresholding
 # binary_image = thresholding(image)
 # binary_image.show()
+
+# processed_image = contrast_adjustment(image, 5)
+# processed_image.show()
